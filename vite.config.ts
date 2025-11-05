@@ -4,7 +4,7 @@ import svgr from "vite-plugin-svgr";
 
 // https://vite.dev/config/
 export default defineConfig({
-    base:"/TailAdmin/",
+    base:"/",
   plugins: [
     react(),
     svgr({
@@ -16,4 +16,15 @@ export default defineConfig({
       },
     }),
   ],
+  define: {
+    'global': 'globalThis',
+  },
+  resolve: {
+    alias: {
+      buffer: 'buffer',
+    },
+  },
+  optimizeDeps: {
+    include: ['buffer'],
+  },
 });

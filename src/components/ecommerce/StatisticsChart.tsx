@@ -62,18 +62,18 @@ export default function StatisticsChart() {
     xaxis: {
       type: "category", // Category-based x-axis
       categories: [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sep",
-        "Oct",
-        "Nov",
-        "Dec",
+        "06:00",
+        "09:00",
+        "12:00",
+        "15:00",
+        "18:00",
+        "21:00",
+        "24:00",
+        "01:00",
+        "02:00",
+        "03:00",
+        "04:00",
+        "05:00",
       ],
       axisBorder: {
         show: false, // Hide x-axis border
@@ -103,12 +103,16 @@ export default function StatisticsChart() {
 
   const series = [
     {
-      name: "Sales",
-      data: [180, 190, 170, 160, 175, 165, 170, 205, 230, 210, 240, 235],
+      name: "DO (mg/L)",
+      data: [6, 6, 5.5, 5, 5, 5.2, 5.3, 5.4, 5.5, 6, 6, 5.5],
     },
     {
-      name: "Revenue",
-      data: [40, 30, 50, 40, 55, 40, 70, 100, 110, 120, 150, 140],
+      name: "Temp (C)",
+      data: [26, 27, 32, 32, 31, 30, 29, 28, 28, 27, 27, 26],
+    },
+    {
+      name: "pH",
+      data: [6, 7, 8, 8, 8, 7, 7, 7, 6, 6, 7, 7],
     },
   ];
   return (
@@ -116,7 +120,7 @@ export default function StatisticsChart() {
       <div className="flex flex-col gap-5 mb-6 sm:flex-row sm:justify-between">
         <div className="w-full">
           <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">
-            Statistics
+            คุณภาพน้ำ (24 ชม.)
           </h3>
           <p className="mt-1 text-gray-500 text-theme-sm dark:text-gray-400">
             Target you’ve set for each month

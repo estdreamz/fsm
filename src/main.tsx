@@ -1,5 +1,6 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import { Buffer } from 'buffer';
 import "./index.css";
 import "swiper/swiper-bundle.css";
 import "simplebar-react/dist/simplebar.min.css";
@@ -7,6 +8,9 @@ import App from "./App.tsx";
 import { AppWrapper } from "./components/common/PageMeta.tsx";
 import { ThemeProvider } from "./context/ThemeContext.tsx";
 import Footer from "./components/footer/Footer.tsx";
+
+// Polyfill Buffer for browser
+globalThis.Buffer = Buffer;
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

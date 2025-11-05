@@ -6,7 +6,7 @@ import { DropdownItem } from "../ui/dropdown/DropdownItem";
 import { MoreDotIcon } from "../../icons";
 
 export default function MonthlyTarget() {
-  const series = [75.55];
+  const series = [56.25];
   const options: ApexOptions = {
     colors: ["#465FFF"],
     chart: {
@@ -69,10 +69,10 @@ export default function MonthlyTarget() {
         <div className="flex justify-between">
           <div>
             <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">
-              Monthly Target
+              ให้อาหารรวมวันนี้
             </h3>
             <p className="mt-1 text-gray-500 text-theme-sm dark:text-gray-400">
-              Target you’ve set for each month
+              เป้าหมายการให้อาหารของวันนี้
             </p>
           </div>
           <div className="relative inline-block">
@@ -114,8 +114,7 @@ export default function MonthlyTarget() {
           </span>
         </div>
         <p className="mx-auto mt-10 w-full max-w-[380px] text-center text-sm text-gray-500 sm:text-base">
-          You earn $3287 today, it's higher than last month. Keep up your good
-          work!
+         กราฟแสดงรายละเอียดปริมาณที่วางแผนการให้อาหาร
         </p>
       </div>
 
@@ -125,7 +124,7 @@ export default function MonthlyTarget() {
             Target
           </p>
           <p className="flex items-center justify-center gap-1 text-base font-semibold text-gray-800 dark:text-white/90 sm:text-lg">
-            $20K
+            80 Kg.
             <svg
               width="16"
               height="16"
@@ -147,10 +146,10 @@ export default function MonthlyTarget() {
 
         <div>
           <p className="mb-1 text-center text-gray-500 text-theme-xs dark:text-gray-400 sm:text-sm">
-            Revenue
+            ให้ไปแล้ว
           </p>
           <p className="flex items-center justify-center gap-1 text-base font-semibold text-gray-800 dark:text-white/90 sm:text-lg">
-            $20K
+            45 Kg.
             <svg
               width="16"
               height="16"
@@ -172,10 +171,10 @@ export default function MonthlyTarget() {
 
         <div>
           <p className="mb-1 text-center text-gray-500 text-theme-xs dark:text-gray-400 sm:text-sm">
-            Today
+            ต้องให้อีก
           </p>
           <p className="flex items-center justify-center gap-1 text-base font-semibold text-gray-800 dark:text-white/90 sm:text-lg">
-            $20K
+            35 Kg.
             <svg
               width="16"
               height="16"

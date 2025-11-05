@@ -1,10 +1,14 @@
 import { useState } from "react";
 import { DropdownItem } from "../ui/dropdown/DropdownItem";
 import { Dropdown } from "../ui/dropdown/Dropdown";
-import { Link } from "react-router";
+import { useNavigate } from "react-router";
+import { Auth } from "../../utils/rest";
+import { useProfile } from "../../context/ProfileContext";
 
 export default function UserDropdown() {
   const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
+  const { clearProfile } = useProfile();
 
   function toggleDropdown() {
     setIsOpen(!isOpen);
@@ -12,6 +16,35 @@ export default function UserDropdown() {
 
   function closeDropdown() {
     setIsOpen(false);
+  }
+
+  async function handleSignOut() {
+    try {
+      console.log("UserDropdown - Starting sign out...");
+      
+      // 1. Call API signout (if needed)
+      await Auth.signout(true);
+      console.log("UserDropdown - API signout complete");
+      
+      // 2. Clear profile from context
+      clearProfile();
+      console.log("UserDropdown - Profile cleared from context");
+      
+      // 3. Clear localStorage
+      localStorage.removeItem("userProfile");
+      console.log("UserDropdown - localStorage cleared");
+      
+      // 4. Navigate to signin
+      console.log("UserDropdown - Navigating to signin");
+      navigate("/signin");
+    } catch (error) {
+      console.error("UserDropdown - Sign out error:", error);
+      
+      // Even if API call fails, still clear everything locally
+      clearProfile();
+      localStorage.removeItem("userProfile");
+      navigate("/signin");
+    }
   }
   return (
     <div className="relative">
@@ -23,7 +56,7 @@ export default function UserDropdown() {
           <img src="./images/user/owner.jpg" alt="User" />
         </span>
 
-        <span className="block mr-1 font-medium text-theme-sm">Musharof</span>
+        <span className="block mr-1 font-medium text-theme-sm">Admin</span>
         <svg
           className={`stroke-gray-500 dark:stroke-gray-400 transition-transform duration-200 ${
             isOpen ? "rotate-180" : ""
@@ -51,10 +84,10 @@ export default function UserDropdown() {
       >
         <div>
           <span className="block font-medium text-gray-700 text-theme-sm dark:text-gray-400">
-            Musharof Chowdhury
+            Administrator Team
           </span>
           <span className="mt-0.5 block text-theme-xs text-gray-500 dark:text-gray-400">
-            randomuser@pimjo.com
+            admin@fms.zone
           </span>
         </div>
 
@@ -63,7 +96,7 @@ export default function UserDropdown() {
             <DropdownItem
               onItemClick={closeDropdown}
               tag="a"
-              to="/profile"
+              to="/dashboard/profile"
               className="flex items-center gap-3 px-3 py-2 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
             >
               <svg
@@ -81,14 +114,14 @@ export default function UserDropdown() {
                   fill=""
                 />
               </svg>
-              Edit profile
+              แก้ไขข้อมูล
             </DropdownItem>
           </li>
           <li>
             <DropdownItem
               onItemClick={closeDropdown}
               tag="a"
-              to="/profile"
+              to="/dashboard/profile"
               className="flex items-center gap-3 px-3 py-2 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
             >
               <svg
@@ -106,7 +139,7 @@ export default function UserDropdown() {
                   fill=""
                 />
               </svg>
-              Account settings
+              ตั้งค่าผู้ใช้งาน
             </DropdownItem>
           </li>
           <li>
@@ -131,12 +164,12 @@ export default function UserDropdown() {
                   fill=""
                 />
               </svg>
-              Support
+              สนับสนุน
             </DropdownItem>
           </li>
         </ul>
-        <Link
-          to="/signin"
+        <button
+          onClick={handleSignOut}
           className="flex items-center gap-3 px-3 py-2 mt-3 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
         >
           <svg
@@ -154,8 +187,8 @@ export default function UserDropdown() {
               fill=""
             />
           </svg>
-          Sign out
-        </Link>
+          ออกจากระบบ
+        </button>
       </Dropdown>
     </div>
   );
