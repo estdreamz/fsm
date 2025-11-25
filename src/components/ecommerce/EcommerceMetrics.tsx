@@ -5,8 +5,24 @@ import {
   GroupIcon,
 } from "../../icons";
 import Badge from "../ui/badge/Badge";
+import type { EcommerceMetricsData } from "../../services/mockApi";
 
-export default function EcommerceMetrics() {
+interface Props {
+  data?: EcommerceMetricsData | null;
+}
+
+export default function EcommerceMetrics({ data }: Props) {
+  const d = data ?? {
+    yieldEstimate: "-",
+    yieldModel: "-",
+    survivalRate: "-",
+    survivalNote: "-",
+    avgDO: "-",
+    avgDONote: "-",
+    feedTotal: "-",
+    feedNote: "-",
+  };
+
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-4 md:gap-3">
       {/* <!-- Metric Item Start --> */}
@@ -17,15 +33,9 @@ export default function EcommerceMetrics() {
 
         <div className="flex items-end justify-between mt-5">
           <div>
-            <span className="text-sm text-gray-500 dark:text-gray-400">
-              ผลผลิตคาดการณ์
-            </span>
-            <h4 className="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">
-              6.8 ตัน
-            </h4>
-             <h3 className="text-sm font-bold text-gray-500 dark:text-gray-400">
-              รุ่น 2025-Q4
-            </h3>
+            <span className="text-sm text-gray-500 dark:text-gray-400">ผลผลิตคาดการณ์</span>
+            <h4 className="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">{d.yieldEstimate}</h4>
+             <h3 className="text-sm font-bold text-gray-500 dark:text-gray-400">{d.yieldModel}</h3>
           </div>
           <Badge color="success">
             <ArrowUpIcon />
@@ -42,15 +52,9 @@ export default function EcommerceMetrics() {
         </div>
         <div className="flex items-end justify-between mt-5">
           <div>
-            <span className="text-sm text-gray-500 dark:text-gray-400">
-              อัตรารอดเฉลี่ย
-            </span>
-            <h4 className="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">
-              91%
-            </h4>
-            <h3 className="text-sm font-bold text-gray-500 dark:text-gray-400">
-              สุขภาพดี
-            </h3>
+            <span className="text-sm text-gray-500 dark:text-gray-400">อัตรารอดเฉลี่ย</span>
+            <h4 className="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">{d.survivalRate}</h4>
+            <h3 className="text-sm font-bold text-gray-500 dark:text-gray-400">{d.survivalNote}</h3>
           </div>
 
           <Badge color="success">
@@ -68,15 +72,9 @@ export default function EcommerceMetrics() {
         </div>
         <div className="flex items-end justify-between mt-5">
           <div>
-            <span className="text-sm text-gray-500 dark:text-gray-400">
-              ค่า DO เฉลี่ยวันนี้
-            </span>
-            <h4 className="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">
-              5.9 mg/L
-            </h4>
-            <h3 className="text-sm font-bold text-gray-500 dark:text-gray-400">
-              เป้าหมาย ≥ 5
-            </h3>
+            <span className="text-sm text-gray-500 dark:text-gray-400">ค่า DO เฉลี่ยวันนี้</span>
+            <h4 className="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">{d.avgDO}</h4>
+            <h3 className="text-sm font-bold text-gray-500 dark:text-gray-400">{d.avgDONote}</h3>
           </div>
 
           <Badge color="success">
@@ -93,15 +91,9 @@ export default function EcommerceMetrics() {
         </div>
         <div className="flex items-end justify-between mt-5">
           <div>
-            <span className="text-sm text-gray-500 dark:text-gray-400">
-              ให้อาหารรวมวันนี้
-            </span>
-            <h4 className="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">
-              80 กก.
-            </h4>
-            <h3 className="text-sm font-bold text-gray-500 dark:text-gray-400">
-              ตามแผน
-            </h3>
+            <span className="text-sm text-gray-500 dark:text-gray-400">ให้อาหารรวมวันนี้</span>
+            <h4 className="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">{d.feedTotal}</h4>
+            <h3 className="text-sm font-bold text-gray-500 dark:text-gray-400">{d.feedNote}</h3>
           </div>
 
           <Badge color="success">

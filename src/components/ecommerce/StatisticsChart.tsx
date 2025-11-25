@@ -1,141 +1,145 @@
-import Chart from "react-apexcharts";
-import { ApexOptions } from "apexcharts";
-import ChartTab from "../common/ChartTab";
+// This file contains the WaterQualityChart component
+// This file contains the WaterQualityChart component
+import React, { useMemo } from 'react';
+import Chart from 'react-apexcharts';
+import { ApexOptions } from 'apexcharts';
+import { WaterQualityDataPoint } from '../../components/types/types';
 
-export default function StatisticsChart() {
+interface WaterQualityChartProps {
+  data: WaterQualityDataPoint[];
+}
+
+const WaterQualityChart: React.FC<WaterQualityChartProps> = ({ data }) => {
+  // base timestamp set to today at 00:00 (midnight)
+  const baseMs = useMemo(() => {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    return d.getTime();
+  }, []);
+
+  // convert series to [{ x: timestamp(ms), y: value }, ...]
+  const series = useMemo(() => [
+    { name: 'Temp (C)', data: data.map((d, i) => ({ x: baseMs + i * 60_000, y: d.temp })), color: '#93C5FD' },
+    { name: 'DO (mg/L)', data: data.map((d, i) => ({ x: baseMs + i * 60_000, y: d.do })), color: '#3B82F6' },
+    { name: 'pH', data: data.map((d, i) => ({ x: baseMs + i * 60_000, y: d.ph })), color: '#6366F1' }
+  ], [data, baseMs]);
+
+  // Fix x-axis to a full 24-hour range starting at midnight (00:00).
+  // The chart axis is independent of the provided data length.
+  const minX = baseMs;
+  const minutesProvided = 24 * 60; // ignore data length; display full day
+  const maxX = baseMs + (minutesProvided - 1) * 60_000;
+
+  // No annotations: rely on x-axis labels for 3-hour markers
+
+  // exact tick timestamps for 00:00, 03:00, 06:00, ... — include ticks that fall within
+  // the visible range, with a small tolerance so near-boundary labels are not dropped.
+  const threeHourTicks = useMemo(() => {
+    const TOL = 3 * 60 * 1000; // 3 minutes tolerance
+    const ticks: number[] = [];
+    for (let h = 0; h < 24; h += 3) {
+      const t = baseMs + h * 60 * 60 * 1000;
+      if (t + TOL >= minX && t - TOL <= maxX) ticks.push(t);
+    }
+    return ticks;
+  }, [baseMs, minX, maxX]);
+
   const options: ApexOptions = {
-    legend: {
-      show: false, // Hide legend
-      position: "top",
-      horizontalAlign: "left",
-    },
-    colors: ["#465FFF", "#9CB9FF"], // Define line colors
-    chart: {
-      fontFamily: "Outfit, sans-serif",
-      height: 310,
-      type: "line", // Set the chart type to 'line'
-      toolbar: {
-        show: false, // Hide chart toolbar
-      },
-    },
-    stroke: {
-      curve: "straight", // Define the line style (straight, smooth, or step)
-      width: [2, 2], // Line width for each dataset
-    },
-
-    fill: {
-      type: "gradient",
-      gradient: {
-        opacityFrom: 0.55,
-        opacityTo: 0,
-      },
-    },
-    markers: {
-      size: 0, // Size of the marker points
-      strokeColors: "#fff", // Marker border color
-      strokeWidth: 2,
-      hover: {
-        size: 6, // Marker size on hover
-      },
-    },
-    grid: {
-      xaxis: {
-        lines: {
-          show: false, // Hide grid lines on x-axis
-        },
-      },
-      yaxis: {
-        lines: {
-          show: true, // Show grid lines on y-axis
-        },
-      },
-    },
-    dataLabels: {
-      enabled: false, // Disable data labels
-    },
-    tooltip: {
-      enabled: true, // Enable tooltip
-      x: {
-        format: "dd MMM yyyy", // Format for x-axis tooltip
-      },
-    },
+    chart: { type: 'area', height: 350, fontFamily: 'Sarabun, Inter, sans-serif', background: 'transparent', toolbar: { show: false }, animations: { enabled: true, speed: 800 }, zoom: { enabled: false }, selection: { enabled: false } },
+    theme: { mode: 'dark' },
+    dataLabels: { enabled: false },
+    stroke: { curve: 'smooth', width: 2 },
+    fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.3, opacityTo: 0.05, stops: [0, 90, 100] } },
     xaxis: {
-      type: "category", // Category-based x-axis
-      categories: [
-        "06:00",
-        "09:00",
-        "12:00",
-        "15:00",
-        "18:00",
-        "21:00",
-        "24:00",
-        "01:00",
-        "02:00",
-        "03:00",
-        "04:00",
-        "05:00",
-      ],
-      axisBorder: {
-        show: false, // Hide x-axis border
-      },
-      axisTicks: {
-        show: false, // Hide x-axis ticks
-      },
-      tooltip: {
-        enabled: false, // Disable tooltip for x-axis points
-      },
-    },
-    yaxis: {
+      type: 'datetime',
+      min: minX,
+      max: maxX,
+      // show axis border and ticks so 3-hour positions are visible
+      axisBorder: { show: true, color: '#334155' },
+      axisTicks: { show: true, color: '#334155' },
       labels: {
-        style: {
-          fontSize: "12px", // Adjust font size for y-axis labels
-          colors: ["#6B7280"], // Color of the labels
+        show: true,
+        datetimeUTC: false,
+        // Prevent ApexCharts from hiding labels that it considers overlapping.
+        hideOverlappingLabels: false,
+        // ensure duplicates are shown when ticks are regular
+        showDuplicates: true,
+        rotate: 0,
+        rotateAlways: false,
+        offsetY: 20,
+        // Always format the tick timestamp as "HH:00". `value` or `timestamp` may be used
+        // depending on ApexCharts version; handle both.
+        formatter: function(value: any, timestamp?: any) {
+          // Compute label index based on minX and 3-hour interval so labels are fixed at
+          // 00:00, 03:00, 06:00, ... regardless of actual tick timestamps.
+          const threeHours = 3 * 60 * 60 * 1000;
+          let ms: number;
+          if (typeof timestamp === 'number') ms = timestamp;
+          else if (typeof value === 'number') ms = value;
+          else ms = Number(value);
+
+          const idx = Math.round((ms - minX) / threeHours);
+          const hh = ((idx * 3) % 24 + 24) % 24; // ensure positive
+          return String(hh).padStart(2, '0') + ':00';
         },
+        style: { colors: '#94a3b8', fontSize: '12px' }
       },
-      title: {
-        text: "", // Remove y-axis title
-        style: {
-          fontSize: "0px",
-        },
-      },
+      // Force ticks every 3 hours. `tickInterval` guarantees tick placement for datetime axis.
+      tickInterval: 3 * 60 * 60 * 1000, // 3 hours in ms
+      // Use explicit tickAmount for a full day: 6 ticks (24/3)
+      tickAmount: 8,
+      tickPlacement: 'on',
+      tooltip: { enabled: false }
     },
+    // annotations removed — rely on native x-axis labels computed above
+    yaxis: { labels: { style: { colors: '#94a3b8', fontSize: '12px' }, formatter: (v) => (Number(v) as number).toFixed(1) }, min: 0, max: 35, tickAmount: 7 },
+    grid: { borderColor: '#334155', strokeDashArray: 0, yaxis: { lines: { show: true } }, xaxis: { lines: { show: false } }, padding: { top: 0, right: 0, bottom: 100, left: 10 } },
+    legend: { show: true, position: 'top', horizontalAlign: 'right', offsetY: -20, itemMargin: { horizontal: 10, vertical: 0 }, labels: { colors: '#e2e8f0' } },
+    tooltip: {
+      theme: 'dark',
+      style: { fontSize: '12px' },
+      x: { show: true },
+      y: { formatter: (val) => (Number(val) as number).toFixed(1) },
+      custom: function({ series, dataPointIndex }: any) {
+        // dataPointIndex corresponds to index within the series data array
+        const timeMs = baseMs + dataPointIndex * 60_000;
+        const t = new Date(timeMs);
+        const hh = String(t.getHours()).padStart(2, '0');
+        const mm = String(t.getMinutes()).padStart(2, '0');
+        const time = `${hh}:${mm}`;
+        const valTemp = series[0][dataPointIndex];
+        const valDO = series[1][dataPointIndex];
+        const valPH = series[2][dataPointIndex];
+        return `
+          <div class="px-4 py-3 bg-slate-800 border border-slate-700 rounded shadow-lg text-slate-200">
+            <div class="text-xs text-slate-400 mb-2 font-semibold">${time}</div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="w-2 h-2 rounded-full bg-blue-300"></span>
+              <span class="text-xs">Temp (C):</span>
+              <span class="font-bold text-sm">${valTemp}</span>
+            </div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+              <span class="text-xs">DO (mg/L):</span>
+              <span class="font-bold text-sm">${valDO}</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
+              <span class="text-xs">pH:</span>
+              <span class="font-bold text-sm">${valPH}</span>
+            </div>
+          </div>
+        `;
+      }
+    },
+    markers: { size: 0, colors: ['#93C5FD', '#3B82F6', '#6366F1'], strokeColors: '#fff', strokeWidth: 2, hover: { size: 6 } }
   };
 
-  const series = [
-    {
-      name: "DO (mg/L)",
-      data: [6, 6, 5.5, 5, 5, 5.2, 5.3, 5.4, 5.5, 6, 6, 5.5],
-    },
-    {
-      name: "Temp (C)",
-      data: [26, 27, 32, 32, 31, 30, 29, 28, 28, 27, 27, 26],
-    },
-    {
-      name: "pH",
-      data: [6, 7, 8, 8, 8, 7, 7, 7, 6, 6, 7, 7],
-    },
-  ];
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white px-5 pb-5 pt-5 dark:border-gray-800 dark:bg-white/[0.03] sm:px-6 sm:pt-6">
-      <div className="flex flex-col gap-5 mb-6 sm:flex-row sm:justify-between">
-        <div className="w-full">
-          <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">
-            คุณภาพน้ำ (24 ชม.)
-          </h3>
-          <p className="mt-1 text-gray-500 text-theme-sm dark:text-gray-400">
-            Target you’ve set for each month
-          </p>
-        </div>
-        <div className="flex items-start w-full gap-3 sm:justify-end">
-          <ChartTab />
-        </div>
-      </div>
-
-      <div className="max-w-full overflow-x-auto custom-scrollbar">
-        <div className="min-w-[1000px] xl:min-w-full">
-          <Chart options={options} series={series} type="area" height={310} />
-        </div>
-      </div>
+    <div className="w-full h-full min-h-[400px]">
+      {typeof window !== 'undefined' && <Chart options={options} series={series} type="area" height={400} />}
     </div>
   );
-}
+};
+
+export default WaterQualityChart;

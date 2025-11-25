@@ -1,0 +1,6 @@
+{
+  "temp": "number",
+  "do": "number",
+  "ph": "number",
+  "time": "string" // HH:MM
+}
