@@ -50,6 +50,8 @@ export default function Home() {
     try {
       const dateObj = new Date(selectedDate + 'T00:00:00');
       const [res, m] = await Promise.all([fetchWaterQuality(dateObj), fetchEcommerceMetrics(dateObj)]);
+      console.log("res",res);
+      
       setData(res);
       setMetrics(m);
     } catch (e) {

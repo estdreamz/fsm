@@ -9,13 +9,13 @@ export async function fetchWaterQuality(date?: string | Date, delayMs = 400): Pr
   try {
     // Send POST using `application/x-www-form-urlencoded` to avoid JSON preflight while
     // still using POST semantics. Many servers accept form-encoded POST bodies.
-    const payload = { farm_id: 'T001', pond_id: '01', limit: '2000', date_: payloadDate };
+    const payload = { farm_id: 'T001', pond_id: '01', limit: '2000', date_: payloadDate.format('yyyy-MM-dd') };
     // Use relative path so dev server proxy can forward to the real host and avoid CORS.
     const res = await axios.post('/api/get_iot2.api', payload, {
       headers: { 'Content-Type': 'application/json' },
       timeout: 3000,
     });
-    console.log("res.data",res.data);
+    console.log("res.data",res);
     console.log("payload",payload);
     
     // Try to return the array from common response shapes
