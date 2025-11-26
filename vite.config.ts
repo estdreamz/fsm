@@ -27,4 +27,15 @@ export default defineConfig({
   optimizeDeps: {
     include: ['buffer'],
   },
+  // Development proxy: forward /api requests to remote host to avoid CORS in browser.
+  server: {
+    proxy: {
+      '/api': {
+        target: 'https://fms.zone',
+        changeOrigin: true,
+        secure: true,
+        rewrite: (path) => path.replace(/^\/api/, '/api'),
+      },
+    },
+  },
 });
